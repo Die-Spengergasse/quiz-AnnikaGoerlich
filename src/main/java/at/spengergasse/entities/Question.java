@@ -15,9 +15,9 @@ public class Question {
     @Column(name = "q_text")
     private String text;
 
-    @OneToMany
-    @JoinColumn(name = "fk_q_id")
-    private List<Answer> answerList= new ArrayList<>();
+    @OneToMany(mappedBy = "question")
+    private List<Answer> answerList;
+
 
     @Override
     public String toString() {
@@ -48,3 +48,6 @@ public class Question {
         return answerList;
     }
 }
+
+
+

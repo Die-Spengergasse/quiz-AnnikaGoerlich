@@ -1,54 +1,62 @@
+
+
 package at.spengergasse.entities;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Quiz {
-    private List<Question> questions;
-    Scanner scanner = new Scanner(System.in);
-    List<Question> questionList=new ArrayList<>();
-    int nextQuestion=0;
+    public class Quiz {
+        private List<Question> questions;
+        private int correctAnswers = 0;
+        private Scanner scanner = new Scanner(System.in);
 
-    public Quiz() {
-        EntityManager em = Persistence.createEntityManagerFactory("demo")
-                .createEntityManager();
-        TypedQuery<Question> query = em.createQuery("SELECT q FROM Question q", Question.class);
-        List<Question> questions = query.getResultList();
-
-    }
-
-    public boolean showQuestionsandAnswers() {
-        Question q;
-        if (nextQuestion >= questionList.size()) {
-            finish();
-            return false;
+        public Quiz() {
+            EntityManager em = Persistence.createEntityManagerFactory("demo").createEntityManager();
+            TypedQuery<Question> query = em.createQuery("SELECT q FROM Question q", Question.class);
+            this.questions = query.getResultList();
         }
-        for(int i = 0;i<questionList.size();i++)
-        {
-            q = questionList.get(i);
-            System.out.println(q);
 
-            System.out.println(i+1 + ") " + q.getAnswerList());
-            System.out.println("Please enter the number of the correct answer: ");
-            int answer = scanner.nextInt();
-            checkCorrectAnswer(q, answer);
-
+        public void start() {
+            for (Question q : questions) {
+                showQuestionandAnswers(q);
+            }
+            showResults();
         }
-        return true;
-    }
 
-    private void checkCorrectAnswer(Question q, int answer) {
-        if (q.getAnswerList().get(answer-1).isCorrect()) {
-            System.out.println("Correct!");
-        } else {
-            System.out.println("Incorrect!");
+        private void showQuestionandAnswers(Question q) {
+            System.out.println("\n" + q.getText());
+
+            List<Answer> answers = q.getAnswerList();
+            for (int i = 0; i < answers.size(); i++) {
+                System.out.println((i + 1) + ") " + answers.get(i).getText());
+            }
+
+            System.out.print("Deine Antwort (1-" + answers.size() + "): ");
+            int choice = scanner.nextInt() - 1;
+
+            if (choice >= 0 && choice < answers.size() && answers.get(choice).isCorrect()) {
+                System.out.println("Richtig!");
+                correctAnswers++;
+            } else {
+                System.out.println("Falsch! Die richtige Antwort war:");
+                for (Answer a : answers) {
+                    if (a.isCorrect()) {
+                        System.out.println(a.getText());
+                    }
+                }
+            }
+        }
+
+        private void showResults() {
+            System.out.println("\nDu hast " + correctAnswers + " von " + questions.size() + " Fragen richtig beantwortet.");
+            double percentage = ((double)correctAnswers / questions.size()) * 100;  //Da habe ich nachgeschaut wie man das richtig schreibt (double).
+            System.out.println("Erfolgsrate: " + String.format("%.2f", percentage) + "%");  //Hier habe ich auch nachgeschaut wie man da macht.
         }
     }
 
-    private void finish() {
-    }
-}
+
+
+

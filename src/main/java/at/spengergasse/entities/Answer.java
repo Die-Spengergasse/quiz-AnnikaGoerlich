@@ -3,7 +3,7 @@ package at.spengergasse.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "a_answer")
+@Table(name = "a_answers")
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +15,10 @@ public class Answer {
 
     @Column(name = "a_correct")
     private boolean correct;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_q_id")
+    private Question question;
 
     @Override
     public String toString() {
@@ -50,3 +54,7 @@ public class Answer {
         this.correct = correct;
     }
 }
+
+
+
+
